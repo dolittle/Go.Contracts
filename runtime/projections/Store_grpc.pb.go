@@ -133,5 +133,5 @@ var Projections_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "Runtime/Projections/Projections.proto",
+	Metadata: "Runtime/Projections/Store.proto",
 }
