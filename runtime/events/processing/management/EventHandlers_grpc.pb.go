@@ -32,7 +32,7 @@ func NewEventHandlersClient(cc grpc.ClientConnInterface) EventHandlersClient {
 
 func (c *eventHandlersClient) ReprocessEventsFrom(ctx context.Context, in *ReprocessEventsFromRequest, opts ...grpc.CallOption) (*ReprocessEventsFromResponse, error) {
 	out := new(ReprocessEventsFromResponse)
-	err := c.cc.Invoke(ctx, "/dolittle.runtime.events.processing.managament.EventHandlers/ReprocessEventsFrom", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dolittle.runtime.events.processing.management.EventHandlers/ReprocessEventsFrom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *eventHandlersClient) ReprocessEventsFrom(ctx context.Context, in *Repro
 
 func (c *eventHandlersClient) ReprocessAllEvents(ctx context.Context, in *ReprocessAllEventsRequest, opts ...grpc.CallOption) (*ReprocessAllEventsResponse, error) {
 	out := new(ReprocessAllEventsResponse)
-	err := c.cc.Invoke(ctx, "/dolittle.runtime.events.processing.managament.EventHandlers/ReprocessAllEvents", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dolittle.runtime.events.processing.management.EventHandlers/ReprocessAllEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func _EventHandlers_ReprocessEventsFrom_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dolittle.runtime.events.processing.managament.EventHandlers/ReprocessEventsFrom",
+		FullMethod: "/dolittle.runtime.events.processing.management.EventHandlers/ReprocessEventsFrom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EventHandlersServer).ReprocessEventsFrom(ctx, req.(*ReprocessEventsFromRequest))
@@ -108,7 +108,7 @@ func _EventHandlers_ReprocessAllEvents_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dolittle.runtime.events.processing.managament.EventHandlers/ReprocessAllEvents",
+		FullMethod: "/dolittle.runtime.events.processing.management.EventHandlers/ReprocessAllEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EventHandlersServer).ReprocessAllEvents(ctx, req.(*ReprocessAllEventsRequest))
@@ -120,7 +120,7 @@ func _EventHandlers_ReprocessAllEvents_Handler(srv interface{}, ctx context.Cont
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var EventHandlers_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "dolittle.runtime.events.processing.managament.EventHandlers",
+	ServiceName: "dolittle.runtime.events.processing.management.EventHandlers",
 	HandlerType: (*EventHandlersServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
