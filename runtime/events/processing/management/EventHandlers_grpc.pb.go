@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type EventHandlersClient interface {
 	ReprocessEventsFrom(ctx context.Context, in *ReprocessEventsFromRequest, opts ...grpc.CallOption) (*ReprocessEventsFromResponse, error)
 	ReprocessAllEvents(ctx context.Context, in *ReprocessAllEventsRequest, opts ...grpc.CallOption) (*ReprocessAllEventsResponse, error)
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 }
 
 type eventHandlersClient struct {
@@ -48,12 +49,22 @@ func (c *eventHandlersClient) ReprocessAllEvents(ctx context.Context, in *Reproc
 	return out, nil
 }
 
+func (c *eventHandlersClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/dolittle.runtime.events.processing.management.EventHandlers/GetAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventHandlersServer is the server API for EventHandlers service.
 // All implementations must embed UnimplementedEventHandlersServer
 // for forward compatibility
 type EventHandlersServer interface {
 	ReprocessEventsFrom(context.Context, *ReprocessEventsFromRequest) (*ReprocessEventsFromResponse, error)
 	ReprocessAllEvents(context.Context, *ReprocessAllEventsRequest) (*ReprocessAllEventsResponse, error)
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	mustEmbedUnimplementedEventHandlersServer()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedEventHandlersServer) ReprocessEventsFrom(context.Context, *Re
 }
 func (UnimplementedEventHandlersServer) ReprocessAllEvents(context.Context, *ReprocessAllEventsRequest) (*ReprocessAllEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReprocessAllEvents not implemented")
+}
+func (UnimplementedEventHandlersServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedEventHandlersServer) mustEmbedUnimplementedEventHandlersServer() {}
 
@@ -116,6 +130,24 @@ func _EventHandlers_ReprocessAllEvents_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventHandlers_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventHandlersServer).GetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dolittle.runtime.events.processing.management.EventHandlers/GetAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventHandlersServer).GetAll(ctx, req.(*GetAllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventHandlers_ServiceDesc is the grpc.ServiceDesc for EventHandlers service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +162,10 @@ var EventHandlers_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReprocessAllEvents",
 			Handler:    _EventHandlers_ReprocessAllEvents_Handler,
+		},
+		{
+			MethodName: "GetAll",
+			Handler:    _EventHandlers_GetAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
