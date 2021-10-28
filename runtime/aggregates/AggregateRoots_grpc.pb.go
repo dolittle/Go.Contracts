@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AggregateRootsClient interface {
-	Register(ctx context.Context, in *AggregateRootRegistrationRequest, opts ...grpc.CallOption) (*AggregateRootRegistrationResponse, error)
+	RegisterAlias(ctx context.Context, in *AggregateRootAliasRegistrationRequest, opts ...grpc.CallOption) (*AggregateRootAliasRegistrationResponse, error)
 }
 
 type aggregateRootsClient struct {
@@ -29,9 +29,9 @@ func NewAggregateRootsClient(cc grpc.ClientConnInterface) AggregateRootsClient {
 	return &aggregateRootsClient{cc}
 }
 
-func (c *aggregateRootsClient) Register(ctx context.Context, in *AggregateRootRegistrationRequest, opts ...grpc.CallOption) (*AggregateRootRegistrationResponse, error) {
-	out := new(AggregateRootRegistrationResponse)
-	err := c.cc.Invoke(ctx, "/dolittle.runtime.aggregates.AggregateRoots/Register", in, out, opts...)
+func (c *aggregateRootsClient) RegisterAlias(ctx context.Context, in *AggregateRootAliasRegistrationRequest, opts ...grpc.CallOption) (*AggregateRootAliasRegistrationResponse, error) {
+	out := new(AggregateRootAliasRegistrationResponse)
+	err := c.cc.Invoke(ctx, "/dolittle.runtime.aggregates.AggregateRoots/RegisterAlias", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *aggregateRootsClient) Register(ctx context.Context, in *AggregateRootRe
 // All implementations must embed UnimplementedAggregateRootsServer
 // for forward compatibility
 type AggregateRootsServer interface {
-	Register(context.Context, *AggregateRootRegistrationRequest) (*AggregateRootRegistrationResponse, error)
+	RegisterAlias(context.Context, *AggregateRootAliasRegistrationRequest) (*AggregateRootAliasRegistrationResponse, error)
 	mustEmbedUnimplementedAggregateRootsServer()
 }
 
@@ -50,8 +50,8 @@ type AggregateRootsServer interface {
 type UnimplementedAggregateRootsServer struct {
 }
 
-func (UnimplementedAggregateRootsServer) Register(context.Context, *AggregateRootRegistrationRequest) (*AggregateRootRegistrationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+func (UnimplementedAggregateRootsServer) RegisterAlias(context.Context, *AggregateRootAliasRegistrationRequest) (*AggregateRootAliasRegistrationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterAlias not implemented")
 }
 func (UnimplementedAggregateRootsServer) mustEmbedUnimplementedAggregateRootsServer() {}
 
@@ -66,20 +66,20 @@ func RegisterAggregateRootsServer(s grpc.ServiceRegistrar, srv AggregateRootsSer
 	s.RegisterService(&AggregateRoots_ServiceDesc, srv)
 }
 
-func _AggregateRoots_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AggregateRootRegistrationRequest)
+func _AggregateRoots_RegisterAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AggregateRootAliasRegistrationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AggregateRootsServer).Register(ctx, in)
+		return srv.(AggregateRootsServer).RegisterAlias(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dolittle.runtime.aggregates.AggregateRoots/Register",
+		FullMethod: "/dolittle.runtime.aggregates.AggregateRoots/RegisterAlias",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AggregateRootsServer).Register(ctx, req.(*AggregateRootRegistrationRequest))
+		return srv.(AggregateRootsServer).RegisterAlias(ctx, req.(*AggregateRootAliasRegistrationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +92,8 @@ var AggregateRoots_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AggregateRootsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Register",
-			Handler:    _AggregateRoots_Register_Handler,
+			MethodName: "RegisterAlias",
+			Handler:    _AggregateRoots_RegisterAlias_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
