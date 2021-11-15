@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResourcesClient interface {
-	GetMongoDB(ctx context.Context, in *GetMongoDBRequest, opts ...grpc.CallOption) (*GetMongoDBResponse, error)
+	GetMongoDB(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMongoDBResponse, error)
 }
 
 type resourcesClient struct {
@@ -29,7 +29,7 @@ func NewResourcesClient(cc grpc.ClientConnInterface) ResourcesClient {
 	return &resourcesClient{cc}
 }
 
-func (c *resourcesClient) GetMongoDB(ctx context.Context, in *GetMongoDBRequest, opts ...grpc.CallOption) (*GetMongoDBResponse, error) {
+func (c *resourcesClient) GetMongoDB(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMongoDBResponse, error) {
 	out := new(GetMongoDBResponse)
 	err := c.cc.Invoke(ctx, "/dolittle.runtime.resources.Resources/GetMongoDB", in, out, opts...)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *resourcesClient) GetMongoDB(ctx context.Context, in *GetMongoDBRequest,
 // All implementations must embed UnimplementedResourcesServer
 // for forward compatibility
 type ResourcesServer interface {
-	GetMongoDB(context.Context, *GetMongoDBRequest) (*GetMongoDBResponse, error)
+	GetMongoDB(context.Context, *GetRequest) (*GetMongoDBResponse, error)
 	mustEmbedUnimplementedResourcesServer()
 }
 
@@ -50,7 +50,7 @@ type ResourcesServer interface {
 type UnimplementedResourcesServer struct {
 }
 
-func (UnimplementedResourcesServer) GetMongoDB(context.Context, *GetMongoDBRequest) (*GetMongoDBResponse, error) {
+func (UnimplementedResourcesServer) GetMongoDB(context.Context, *GetRequest) (*GetMongoDBResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMongoDB not implemented")
 }
 func (UnimplementedResourcesServer) mustEmbedUnimplementedResourcesServer() {}
@@ -67,7 +67,7 @@ func RegisterResourcesServer(s grpc.ServiceRegistrar, srv ResourcesServer) {
 }
 
 func _Resources_GetMongoDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMongoDBRequest)
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func _Resources_GetMongoDB_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/dolittle.runtime.resources.Resources/GetMongoDB",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourcesServer).GetMongoDB(ctx, req.(*GetMongoDBRequest))
+		return srv.(ResourcesServer).GetMongoDB(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
