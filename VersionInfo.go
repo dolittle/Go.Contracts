@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            6,
 		Minor:            4,
 		Patch:            0,
-		PreReleaseString: "gimli.2",
+		PreReleaseString: "gimli.3",
 	}
 }
