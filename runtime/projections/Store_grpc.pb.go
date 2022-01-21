@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ProjectionsClient interface {
 	GetOne(ctx context.Context, in *GetOneRequest, opts ...grpc.CallOption) (*GetOneResponse, error)
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetAllInBatches(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (Projections_GetAllInBatchesClient, error)
 }
 
 type projectionsClient struct {
@@ -52,12 +53,45 @@ func (c *projectionsClient) GetAll(ctx context.Context, in *GetAllRequest, opts 
 	return out, nil
 }
 
+func (c *projectionsClient) GetAllInBatches(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (Projections_GetAllInBatchesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Projections_ServiceDesc.Streams[0], "/dolittle.runtime.projections.Projections/GetAllInBatches", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &projectionsGetAllInBatchesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Projections_GetAllInBatchesClient interface {
+	Recv() (*GetAllResponse, error)
+	grpc.ClientStream
+}
+
+type projectionsGetAllInBatchesClient struct {
+	grpc.ClientStream
+}
+
+func (x *projectionsGetAllInBatchesClient) Recv() (*GetAllResponse, error) {
+	m := new(GetAllResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ProjectionsServer is the server API for Projections service.
 // All implementations must embed UnimplementedProjectionsServer
 // for forward compatibility
 type ProjectionsServer interface {
 	GetOne(context.Context, *GetOneRequest) (*GetOneResponse, error)
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	GetAllInBatches(*GetAllRequest, Projections_GetAllInBatchesServer) error
 	mustEmbedUnimplementedProjectionsServer()
 }
 
@@ -70,6 +104,9 @@ func (UnimplementedProjectionsServer) GetOne(context.Context, *GetOneRequest) (*
 }
 func (UnimplementedProjectionsServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedProjectionsServer) GetAllInBatches(*GetAllRequest, Projections_GetAllInBatchesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllInBatches not implemented")
 }
 func (UnimplementedProjectionsServer) mustEmbedUnimplementedProjectionsServer() {}
 
@@ -120,6 +157,27 @@ func _Projections_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Projections_GetAllInBatches_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetAllRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProjectionsServer).GetAllInBatches(m, &projectionsGetAllInBatchesServer{stream})
+}
+
+type Projections_GetAllInBatchesServer interface {
+	Send(*GetAllResponse) error
+	grpc.ServerStream
+}
+
+type projectionsGetAllInBatchesServer struct {
+	grpc.ServerStream
+}
+
+func (x *projectionsGetAllInBatchesServer) Send(m *GetAllResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // Projections_ServiceDesc is the grpc.ServiceDesc for Projections service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -136,6 +194,12 @@ var Projections_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Projections_GetAll_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllInBatches",
+			Handler:       _Projections_GetAllInBatches_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "Runtime/Projections/Store.proto",
 }
