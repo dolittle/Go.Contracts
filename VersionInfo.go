@@ -8,8 +8,8 @@ import (
 func GetCurrentVersion() versioning.Version {
 	return versioning.Version{
 		Major:            6,
-		Minor:            6,
+		Minor:            7,
 		Patch:            0,
-		PreReleaseString: "",
+		PreReleaseString: "pippin.0",
 	}
 }
