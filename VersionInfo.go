@@ -9,7 +9,7 @@ func GetCurrentVersion() versioning.Version {
 	return versioning.Version{
 		Major:            6,
 		Minor:            8,
-		Patch:            0,
+		Patch:            1,
 		PreReleaseString: "",
 	}
 }
