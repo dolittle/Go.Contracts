@@ -1,15 +1,15 @@
 package contracts
 
 import (
-	"go.dolittle.io/contracts/v6/versioning"
+	"go.dolittle.io/contracts/v7/versioning"
 )
 
 // GetCurrentVersion returns the current version of the Contracts.
 func GetCurrentVersion() versioning.Version {
 	return versioning.Version{
-		Major:            6,
-		Minor:            8,
-		Patch:            2,
-		PreReleaseString: "",
+		Major:            7,
+		Minor:            0,
+		Patch:            0,
+		PreReleaseString: "meriadoc.0",
 	}
 }
