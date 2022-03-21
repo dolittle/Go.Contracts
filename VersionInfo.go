@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            0,
 		Patch:            0,
-		PreReleaseString: "meriadoc.1",
+		PreReleaseString: "meriadoc.2",
 	}
 }
