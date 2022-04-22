@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            1,
 		Patch:            0,
-		PreReleaseString: "mithrandir.0",
+		PreReleaseString: "",
 	}
 }
