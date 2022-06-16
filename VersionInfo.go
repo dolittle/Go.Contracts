@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            2,
 		Patch:            0,
-		PreReleaseString: "sauron.1",
+		PreReleaseString: "",
 	}
 }
