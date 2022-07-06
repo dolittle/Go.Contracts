@@ -8,8 +8,8 @@ import (
 func GetCurrentVersion() versioning.Version {
 	return versioning.Version{
 		Major:            7,
-		Minor:            3,
+		Minor:            4,
 		Patch:            0,
-		PreReleaseString: "",
+		PreReleaseString: "boromir.0",
 	}
 }
