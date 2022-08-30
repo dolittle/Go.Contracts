@@ -25,6 +25,7 @@ type EventStoreClient interface {
 	Commit(ctx context.Context, in *CommitEventsRequest, opts ...grpc.CallOption) (*CommitEventsResponse, error)
 	CommitForAggregate(ctx context.Context, in *CommitAggregateEventsRequest, opts ...grpc.CallOption) (*CommitAggregateEventsResponse, error)
 	FetchForAggregate(ctx context.Context, in *FetchForAggregateRequest, opts ...grpc.CallOption) (*FetchForAggregateResponse, error)
+	FetchForAggregateInBatches(ctx context.Context, in *FetchForAggregateInBatchesRequest, opts ...grpc.CallOption) (EventStore_FetchForAggregateInBatchesClient, error)
 }
 
 type eventStoreClient struct {
@@ -62,6 +63,38 @@ func (c *eventStoreClient) FetchForAggregate(ctx context.Context, in *FetchForAg
 	return out, nil
 }
 
+func (c *eventStoreClient) FetchForAggregateInBatches(ctx context.Context, in *FetchForAggregateInBatchesRequest, opts ...grpc.CallOption) (EventStore_FetchForAggregateInBatchesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &EventStore_ServiceDesc.Streams[0], "/dolittle.runtime.events.EventStore/FetchForAggregateInBatches", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &eventStoreFetchForAggregateInBatchesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type EventStore_FetchForAggregateInBatchesClient interface {
+	Recv() (*FetchForAggregateResponse, error)
+	grpc.ClientStream
+}
+
+type eventStoreFetchForAggregateInBatchesClient struct {
+	grpc.ClientStream
+}
+
+func (x *eventStoreFetchForAggregateInBatchesClient) Recv() (*FetchForAggregateResponse, error) {
+	m := new(FetchForAggregateResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // EventStoreServer is the server API for EventStore service.
 // All implementations must embed UnimplementedEventStoreServer
 // for forward compatibility
@@ -69,6 +102,7 @@ type EventStoreServer interface {
 	Commit(context.Context, *CommitEventsRequest) (*CommitEventsResponse, error)
 	CommitForAggregate(context.Context, *CommitAggregateEventsRequest) (*CommitAggregateEventsResponse, error)
 	FetchForAggregate(context.Context, *FetchForAggregateRequest) (*FetchForAggregateResponse, error)
+	FetchForAggregateInBatches(*FetchForAggregateInBatchesRequest, EventStore_FetchForAggregateInBatchesServer) error
 	mustEmbedUnimplementedEventStoreServer()
 }
 
@@ -84,6 +118,9 @@ func (UnimplementedEventStoreServer) CommitForAggregate(context.Context, *Commit
 }
 func (UnimplementedEventStoreServer) FetchForAggregate(context.Context, *FetchForAggregateRequest) (*FetchForAggregateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchForAggregate not implemented")
+}
+func (UnimplementedEventStoreServer) FetchForAggregateInBatches(*FetchForAggregateInBatchesRequest, EventStore_FetchForAggregateInBatchesServer) error {
+	return status.Errorf(codes.Unimplemented, "method FetchForAggregateInBatches not implemented")
 }
 func (UnimplementedEventStoreServer) mustEmbedUnimplementedEventStoreServer() {}
 
@@ -152,6 +189,27 @@ func _EventStore_FetchForAggregate_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventStore_FetchForAggregateInBatches_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(FetchForAggregateInBatchesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(EventStoreServer).FetchForAggregateInBatches(m, &eventStoreFetchForAggregateInBatchesServer{stream})
+}
+
+type EventStore_FetchForAggregateInBatchesServer interface {
+	Send(*FetchForAggregateResponse) error
+	grpc.ServerStream
+}
+
+type eventStoreFetchForAggregateInBatchesServer struct {
+	grpc.ServerStream
+}
+
+func (x *eventStoreFetchForAggregateInBatchesServer) Send(m *FetchForAggregateResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // EventStore_ServiceDesc is the grpc.ServiceDesc for EventStore service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,6 +230,12 @@ var EventStore_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EventStore_FetchForAggregate_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "FetchForAggregateInBatches",
+			Handler:       _EventStore_FetchForAggregateInBatches_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "Runtime/Events/EventStore.proto",
 }
