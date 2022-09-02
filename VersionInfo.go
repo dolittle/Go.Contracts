@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            4,
 		Patch:            0,
-		PreReleaseString: "treebeard.1",
+		PreReleaseString: "treebeard.2",
 	}
 }
