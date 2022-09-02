@@ -23,7 +23,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AggregateRootsClient interface {
 	RegisterAlias(ctx context.Context, in *AggregateRootAliasRegistrationRequest, opts ...grpc.CallOption) (*AggregateRootAliasRegistrationResponse, error)
-	GetVersion(ctx context.Context, in *AggregateRootVersionRequest, opts ...grpc.CallOption) (*AggregateRootVersionResponse, error)
 }
 
 type aggregateRootsClient struct {
@@ -43,21 +42,11 @@ func (c *aggregateRootsClient) RegisterAlias(ctx context.Context, in *AggregateR
 	return out, nil
 }
 
-func (c *aggregateRootsClient) GetVersion(ctx context.Context, in *AggregateRootVersionRequest, opts ...grpc.CallOption) (*AggregateRootVersionResponse, error) {
-	out := new(AggregateRootVersionResponse)
-	err := c.cc.Invoke(ctx, "/dolittle.runtime.aggregates.AggregateRoots/GetVersion", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AggregateRootsServer is the server API for AggregateRoots service.
 // All implementations must embed UnimplementedAggregateRootsServer
 // for forward compatibility
 type AggregateRootsServer interface {
 	RegisterAlias(context.Context, *AggregateRootAliasRegistrationRequest) (*AggregateRootAliasRegistrationResponse, error)
-	GetVersion(context.Context, *AggregateRootVersionRequest) (*AggregateRootVersionResponse, error)
 	mustEmbedUnimplementedAggregateRootsServer()
 }
 
@@ -67,9 +56,6 @@ type UnimplementedAggregateRootsServer struct {
 
 func (UnimplementedAggregateRootsServer) RegisterAlias(context.Context, *AggregateRootAliasRegistrationRequest) (*AggregateRootAliasRegistrationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterAlias not implemented")
-}
-func (UnimplementedAggregateRootsServer) GetVersion(context.Context, *AggregateRootVersionRequest) (*AggregateRootVersionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
 }
 func (UnimplementedAggregateRootsServer) mustEmbedUnimplementedAggregateRootsServer() {}
 
@@ -102,24 +88,6 @@ func _AggregateRoots_RegisterAlias_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AggregateRoots_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AggregateRootVersionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AggregateRootsServer).GetVersion(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/dolittle.runtime.aggregates.AggregateRoots/GetVersion",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AggregateRootsServer).GetVersion(ctx, req.(*AggregateRootVersionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AggregateRoots_ServiceDesc is the grpc.ServiceDesc for AggregateRoots service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,10 +98,6 @@ var AggregateRoots_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterAlias",
 			Handler:    _AggregateRoots_RegisterAlias_Handler,
-		},
-		{
-			MethodName: "GetVersion",
-			Handler:    _AggregateRoots_GetVersion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
