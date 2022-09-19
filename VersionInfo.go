@@ -8,8 +8,8 @@ import (
 func GetCurrentVersion() versioning.Version {
 	return versioning.Version{
 		Major:            7,
-		Minor:            4,
+		Minor:            5,
 		Patch:            0,
-		PreReleaseString: "",
+		PreReleaseString: "arwen.0",
 	}
 }

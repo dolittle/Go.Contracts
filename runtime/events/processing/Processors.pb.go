@@ -31,9 +31,10 @@ type ProcessorFailure struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Reason       string               `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
-	Retry        bool                 `protobuf:"varint,2,opt,name=retry,proto3" json:"retry,omitempty"`
-	RetryTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=retryTimeout,proto3" json:"retryTimeout,omitempty"`
+	Reason        string               `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
+	Retry         bool                 `protobuf:"varint,2,opt,name=retry,proto3" json:"retry,omitempty"`
+	RetryTimeout  *durationpb.Duration `protobuf:"bytes,3,opt,name=retryTimeout,proto3" json:"retryTimeout,omitempty"`
+	EventMetadata *StreamEventMetadata `protobuf:"bytes,4,opt,name=eventMetadata,proto3" json:"eventMetadata,omitempty"` // The metadata of the event that failed
 }
 
 func (x *ProcessorFailure) Reset() {
@@ -85,6 +86,13 @@ func (x *ProcessorFailure) GetRetry() bool {
 func (x *ProcessorFailure) GetRetryTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.RetryTimeout
+	}
+	return nil
+}
+
+func (x *ProcessorFailure) GetEventMetadata() *StreamEventMetadata {
+	if x != nil {
+		return x.EventMetadata
 	}
 	return nil
 }
@@ -590,15 +598,21 @@ var file_Runtime_Events_Processing_Processors_proto_rawDesc = []byte{
 	0x2f, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x62, 0x75, 0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x22, 0x7f, 0x0a, 0x10, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x72, 0x46,
-	0x61, 0x69, 0x6c, 0x75, 0x72, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x12, 0x14,
-	0x0a, 0x05, 0x72, 0x65, 0x74, 0x72, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x72,
-	0x65, 0x74, 0x72, 0x79, 0x12, 0x3d, 0x0a, 0x0c, 0x72, 0x65, 0x74, 0x72, 0x79, 0x54, 0x69, 0x6d,
-	0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0c, 0x72, 0x65, 0x74, 0x72, 0x79, 0x54, 0x69, 0x6d, 0x65,
-	0x6f, 0x75, 0x74, 0x22, 0x5c, 0x0a, 0x14, 0x52, 0x65, 0x74, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x63,
+	0x74, 0x6f, 0x22, 0xde, 0x01, 0x0a, 0x10, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x72,
+	0x46, 0x61, 0x69, 0x6c, 0x75, 0x72, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f,
+	0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x12,
+	0x14, 0x0a, 0x05, 0x72, 0x65, 0x74, 0x72, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05,
+	0x72, 0x65, 0x74, 0x72, 0x79, 0x12, 0x3d, 0x0a, 0x0c, 0x72, 0x65, 0x74, 0x72, 0x79, 0x54, 0x69,
+	0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0c, 0x72, 0x65, 0x74, 0x72, 0x79, 0x54, 0x69, 0x6d,
+	0x65, 0x6f, 0x75, 0x74, 0x12, 0x5d, 0x0a, 0x0d, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x37, 0x2e, 0x64, 0x6f,
+	0x6c, 0x69, 0x74, 0x74, 0x6c, 0x65, 0x2e, 0x72, 0x75, 0x6e, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x65,
+	0x76, 0x65, 0x6e, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x69, 0x6e, 0x67,
+	0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0x52, 0x0d, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0x22, 0x5c, 0x0a, 0x14, 0x52, 0x65, 0x74, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x63,
 	0x65, 0x73, 0x73, 0x69, 0x6e, 0x67, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x24, 0x0a, 0x0d, 0x66,
 	0x61, 0x69, 0x6c, 0x75, 0x72, 0x65, 0x52, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x0d, 0x66, 0x61, 0x69, 0x6c, 0x75, 0x72, 0x65, 0x52, 0x65, 0x61, 0x73, 0x6f,
@@ -739,40 +753,42 @@ var file_Runtime_Events_Processing_Processors_proto_goTypes = []interface{}{
 	(*ProcessEventRequest)(nil),                  // 6: dolittle.runtime.events.processing.ProcessEventRequest
 	(*ProcessorRuntimeToClientMessage)(nil),      // 7: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage
 	(*durationpb.Duration)(nil),                  // 8: google.protobuf.Duration
-	(*services.ReverseCallArgumentsContext)(nil), // 9: dolittle.services.ReverseCallArgumentsContext
-	(*protobuf.Uuid)(nil),                        // 10: dolittle.protobuf.Uuid
-	(*services.ReverseCallResponseContext)(nil),  // 11: dolittle.services.ReverseCallResponseContext
-	(*services.Pong)(nil),                        // 12: dolittle.services.Pong
-	(*protobuf.Failure)(nil),                     // 13: dolittle.protobuf.Failure
-	(*services.ReverseCallRequestContext)(nil),   // 14: dolittle.services.ReverseCallRequestContext
-	(*StreamEvent)(nil),                          // 15: dolittle.runtime.events.processing.StreamEvent
-	(*services.Ping)(nil),                        // 16: dolittle.services.Ping
+	(*StreamEventMetadata)(nil),                  // 9: dolittle.runtime.events.processing.StreamEventMetadata
+	(*services.ReverseCallArgumentsContext)(nil), // 10: dolittle.services.ReverseCallArgumentsContext
+	(*protobuf.Uuid)(nil),                        // 11: dolittle.protobuf.Uuid
+	(*services.ReverseCallResponseContext)(nil),  // 12: dolittle.services.ReverseCallResponseContext
+	(*services.Pong)(nil),                        // 13: dolittle.services.Pong
+	(*protobuf.Failure)(nil),                     // 14: dolittle.protobuf.Failure
+	(*services.ReverseCallRequestContext)(nil),   // 15: dolittle.services.ReverseCallRequestContext
+	(*StreamEvent)(nil),                          // 16: dolittle.runtime.events.processing.StreamEvent
+	(*services.Ping)(nil),                        // 17: dolittle.services.Ping
 }
 var file_Runtime_Events_Processing_Processors_proto_depIdxs = []int32{
 	8,  // 0: dolittle.runtime.events.processing.ProcessorFailure.retryTimeout:type_name -> google.protobuf.Duration
-	9,  // 1: dolittle.runtime.events.processing.ProcessorRegistrationRequest.callContext:type_name -> dolittle.services.ReverseCallArgumentsContext
-	10, // 2: dolittle.runtime.events.processing.ProcessorRegistrationRequest.scopeId:type_name -> dolittle.protobuf.Uuid
-	10, // 3: dolittle.runtime.events.processing.ProcessorRegistrationRequest.processorId:type_name -> dolittle.protobuf.Uuid
-	10, // 4: dolittle.runtime.events.processing.ProcessorRegistrationRequest.sourceStreamId:type_name -> dolittle.protobuf.Uuid
-	11, // 5: dolittle.runtime.events.processing.ProcessorResponse.callContext:type_name -> dolittle.services.ReverseCallResponseContext
-	0,  // 6: dolittle.runtime.events.processing.ProcessorResponse.failure:type_name -> dolittle.runtime.events.processing.ProcessorFailure
-	2,  // 7: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.registrationRequest:type_name -> dolittle.runtime.events.processing.ProcessorRegistrationRequest
-	3,  // 8: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.processingResult:type_name -> dolittle.runtime.events.processing.ProcessorResponse
-	12, // 9: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.pong:type_name -> dolittle.services.Pong
-	13, // 10: dolittle.runtime.events.processing.ProcessorRegistrationResponse.failure:type_name -> dolittle.protobuf.Failure
-	14, // 11: dolittle.runtime.events.processing.ProcessEventRequest.callContext:type_name -> dolittle.services.ReverseCallRequestContext
-	15, // 12: dolittle.runtime.events.processing.ProcessEventRequest.event:type_name -> dolittle.runtime.events.processing.StreamEvent
-	1,  // 13: dolittle.runtime.events.processing.ProcessEventRequest.retryProcessingState:type_name -> dolittle.runtime.events.processing.RetryProcessingState
-	5,  // 14: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.registrationResponse:type_name -> dolittle.runtime.events.processing.ProcessorRegistrationResponse
-	6,  // 15: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.handleRequest:type_name -> dolittle.runtime.events.processing.ProcessEventRequest
-	16, // 16: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.ping:type_name -> dolittle.services.Ping
-	4,  // 17: dolittle.runtime.events.processing.Processors.Connect:input_type -> dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage
-	7,  // 18: dolittle.runtime.events.processing.Processors.Connect:output_type -> dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage
-	18, // [18:19] is the sub-list for method output_type
-	17, // [17:18] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	9,  // 1: dolittle.runtime.events.processing.ProcessorFailure.eventMetadata:type_name -> dolittle.runtime.events.processing.StreamEventMetadata
+	10, // 2: dolittle.runtime.events.processing.ProcessorRegistrationRequest.callContext:type_name -> dolittle.services.ReverseCallArgumentsContext
+	11, // 3: dolittle.runtime.events.processing.ProcessorRegistrationRequest.scopeId:type_name -> dolittle.protobuf.Uuid
+	11, // 4: dolittle.runtime.events.processing.ProcessorRegistrationRequest.processorId:type_name -> dolittle.protobuf.Uuid
+	11, // 5: dolittle.runtime.events.processing.ProcessorRegistrationRequest.sourceStreamId:type_name -> dolittle.protobuf.Uuid
+	12, // 6: dolittle.runtime.events.processing.ProcessorResponse.callContext:type_name -> dolittle.services.ReverseCallResponseContext
+	0,  // 7: dolittle.runtime.events.processing.ProcessorResponse.failure:type_name -> dolittle.runtime.events.processing.ProcessorFailure
+	2,  // 8: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.registrationRequest:type_name -> dolittle.runtime.events.processing.ProcessorRegistrationRequest
+	3,  // 9: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.processingResult:type_name -> dolittle.runtime.events.processing.ProcessorResponse
+	13, // 10: dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage.pong:type_name -> dolittle.services.Pong
+	14, // 11: dolittle.runtime.events.processing.ProcessorRegistrationResponse.failure:type_name -> dolittle.protobuf.Failure
+	15, // 12: dolittle.runtime.events.processing.ProcessEventRequest.callContext:type_name -> dolittle.services.ReverseCallRequestContext
+	16, // 13: dolittle.runtime.events.processing.ProcessEventRequest.event:type_name -> dolittle.runtime.events.processing.StreamEvent
+	1,  // 14: dolittle.runtime.events.processing.ProcessEventRequest.retryProcessingState:type_name -> dolittle.runtime.events.processing.RetryProcessingState
+	5,  // 15: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.registrationResponse:type_name -> dolittle.runtime.events.processing.ProcessorRegistrationResponse
+	6,  // 16: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.handleRequest:type_name -> dolittle.runtime.events.processing.ProcessEventRequest
+	17, // 17: dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage.ping:type_name -> dolittle.services.Ping
+	4,  // 18: dolittle.runtime.events.processing.Processors.Connect:input_type -> dolittle.runtime.events.processing.ProcessorClientToRuntimeMessage
+	7,  // 19: dolittle.runtime.events.processing.Processors.Connect:output_type -> dolittle.runtime.events.processing.ProcessorRuntimeToClientMessage
+	19, // [19:20] is the sub-list for method output_type
+	18, // [18:19] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_Runtime_Events_Processing_Processors_proto_init() }

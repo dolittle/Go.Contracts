@@ -22,7 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EventHandlersClient interface {
+	// Deprecated: Do not use.
 	Connect(ctx context.Context, opts ...grpc.CallOption) (EventHandlers_ConnectClient, error)
+	ConnectBatched(ctx context.Context, opts ...grpc.CallOption) (EventHandlers_ConnectBatchedClient, error)
 }
 
 type eventHandlersClient struct {
@@ -33,6 +35,7 @@ func NewEventHandlersClient(cc grpc.ClientConnInterface) EventHandlersClient {
 	return &eventHandlersClient{cc}
 }
 
+// Deprecated: Do not use.
 func (c *eventHandlersClient) Connect(ctx context.Context, opts ...grpc.CallOption) (EventHandlers_ConnectClient, error) {
 	stream, err := c.cc.NewStream(ctx, &EventHandlers_ServiceDesc.Streams[0], "/dolittle.runtime.events.processing.EventHandlers/Connect", opts...)
 	if err != nil {
@@ -64,11 +67,44 @@ func (x *eventHandlersConnectClient) Recv() (*EventHandlerRuntimeToClientMessage
 	return m, nil
 }
 
+func (c *eventHandlersClient) ConnectBatched(ctx context.Context, opts ...grpc.CallOption) (EventHandlers_ConnectBatchedClient, error) {
+	stream, err := c.cc.NewStream(ctx, &EventHandlers_ServiceDesc.Streams[1], "/dolittle.runtime.events.processing.EventHandlers/ConnectBatched", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &eventHandlersConnectBatchedClient{stream}
+	return x, nil
+}
+
+type EventHandlers_ConnectBatchedClient interface {
+	Send(*EventHandlerClientToRuntimeMessage) error
+	Recv() (*EventHandlerRuntimeToClientMessage, error)
+	grpc.ClientStream
+}
+
+type eventHandlersConnectBatchedClient struct {
+	grpc.ClientStream
+}
+
+func (x *eventHandlersConnectBatchedClient) Send(m *EventHandlerClientToRuntimeMessage) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *eventHandlersConnectBatchedClient) Recv() (*EventHandlerRuntimeToClientMessage, error) {
+	m := new(EventHandlerRuntimeToClientMessage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // EventHandlersServer is the server API for EventHandlers service.
 // All implementations must embed UnimplementedEventHandlersServer
 // for forward compatibility
 type EventHandlersServer interface {
+	// Deprecated: Do not use.
 	Connect(EventHandlers_ConnectServer) error
+	ConnectBatched(EventHandlers_ConnectBatchedServer) error
 	mustEmbedUnimplementedEventHandlersServer()
 }
 
@@ -78,6 +114,9 @@ type UnimplementedEventHandlersServer struct {
 
 func (UnimplementedEventHandlersServer) Connect(EventHandlers_ConnectServer) error {
 	return status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (UnimplementedEventHandlersServer) ConnectBatched(EventHandlers_ConnectBatchedServer) error {
+	return status.Errorf(codes.Unimplemented, "method ConnectBatched not implemented")
 }
 func (UnimplementedEventHandlersServer) mustEmbedUnimplementedEventHandlersServer() {}
 
@@ -118,6 +157,32 @@ func (x *eventHandlersConnectServer) Recv() (*EventHandlerClientToRuntimeMessage
 	return m, nil
 }
 
+func _EventHandlers_ConnectBatched_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(EventHandlersServer).ConnectBatched(&eventHandlersConnectBatchedServer{stream})
+}
+
+type EventHandlers_ConnectBatchedServer interface {
+	Send(*EventHandlerRuntimeToClientMessage) error
+	Recv() (*EventHandlerClientToRuntimeMessage, error)
+	grpc.ServerStream
+}
+
+type eventHandlersConnectBatchedServer struct {
+	grpc.ServerStream
+}
+
+func (x *eventHandlersConnectBatchedServer) Send(m *EventHandlerRuntimeToClientMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *eventHandlersConnectBatchedServer) Recv() (*EventHandlerClientToRuntimeMessage, error) {
+	m := new(EventHandlerClientToRuntimeMessage)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // EventHandlers_ServiceDesc is the grpc.ServiceDesc for EventHandlers service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -129,6 +194,12 @@ var EventHandlers_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Connect",
 			Handler:       _EventHandlers_Connect_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ConnectBatched",
+			Handler:       _EventHandlers_ConnectBatched_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
