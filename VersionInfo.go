@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            5,
 		Patch:            0,
-		PreReleaseString: "arwen.2",
+		PreReleaseString: "arwen.3",
 	}
 }
