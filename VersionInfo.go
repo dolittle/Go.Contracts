@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            4,
 		Patch:            1,
-		PreReleaseString: "elrond.0",
+		PreReleaseString: "",
 	}
 }
