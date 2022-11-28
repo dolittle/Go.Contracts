@@ -10,6 +10,6 @@ func GetCurrentVersion() versioning.Version {
 		Major:            7,
 		Minor:            5,
 		Patch:            0,
-		PreReleaseString: "boromir.0",
+		PreReleaseString: "",
 	}
 }
